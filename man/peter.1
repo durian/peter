@@ -1,0 +1,559 @@
+.TH PETeR 1 05/03/2005 "DurianSoftware PETeR"
+
+.SH PETER
+PETeR \- run programs, and keeps'm running
+
+.SH SYNOPSIS
+.BI "peter config.xml"
+
+.SH DESCRIPTION
+.I PETeR
+is a program that starts any number of programs and can be scripted to
+take a certain action when they exit. It is useful when you want to
+keep a system that is made up of a number of smaller sub-systems
+running. It can also be used as a system monitor tool. Together with
+the main program(s), monitoring programs or scripts can be started
+which trigger different kind of actions when things go wrong.
+
+.I PETeR
+can be controlled with commands in XML format through a socket interface.
+Apart from getting status information, programs can be stopped and
+started through this interface.
+
+The programs and actions are
+configured in an XML file which is read in at startup.
+
+.SH "QUICKSTART EXAMPLE"
+
+Run
+.I PETeR
+with the following configuration file.
+
+.nf
+<peter>
+  <general>
+    <socket port="1024" />
+  </general>
+  <programs>
+    <program name="p1">
+      <cmd>sleep 60</cmd>
+    </program>
+  </programs>
+</peter>
+.fi
+
+This will start up the "sleep 60" command. When it exits after one
+minute, it will be restarted. This will continue until you stop the
+program (press control-c).
+
+.SH DETAILS
+
+On start-up, the configuration file is read and parsed. Then the
+socket interface is opened, and the programs are started one after the
+other. After this,
+.I PETeR
+will wait until a program exits or a command is received over the
+socket interface.
+
+.I PETeR
+will fail to start up in the following cases.
+
+1) XML error (parse error) in the configuration file.
+
+2) Incomplete configuration file. At least one program must be
+specified, as well as the socket definition.
+
+.I PETeR
+will start up with warnings in the following case.
+
+1) The socket cannot be opened. It will run without socket control.
+
+.I PETeR
+will shut down in the following case.
+
+1) A binary being started is not found.
+
+A more detailed explanation follows.
+
+.SS Startup
+
+If a full path is given for a program, 
+.I PETeR
+will check if the binary exists when starting up.
+If just the name of the binary is specified,
+.I PETeR 
+will check for the binary in the directories specified
+in the user's PATH. If more than one is found, a message will be
+printed in the log, and the first one will be the one executed.
+If a binary cannot be found, a message will be printed in the log
+file, and
+.I PETeR
+will exit.
+
+.SS Running
+
+After startup, 
+.I PETeR
+will wait until a program exits. Depending on the configuration, the
+program will be restarted or other programs will be started or stopped.
+Whenever something changes, a new PID file will be written. This file
+is written in the /tmp directory by default.
+
+.SS Exit
+
+.I PETeR
+can be stopped by sending a <quit/> command to it. If it is running in
+the foreground in a terminal, pressing ctrl-c will also stop it. After
+receiving a stop command, all the running programs will be stopped by
+sending a SIGHUP to them. If they haven't stopped after ten seconds, a
+SIGKILL is send to them. When all programs have exited, 
+.I PETeR
+exits.
+
+.SH OUTPUT
+
+.I PETeR
+will log a lot of information when starting up. First of all, its
+process id information.
+
+.nf
+[date]: PETER started.
+[date]:  PID:   4870 PPID:    616
+[date]:  UID:   1704 EUID:   1704
+[date]:  GID:    119 EGID:    119
+.fi
+
+This is followed by the information from the <general> and <programs>
+sections in the configuration file.
+
+.nf
+[date]:  GENERAL
+[date]:  Logging to screen.
+[date]:  PID file: /tmp/pids_004870.xml
+[date]:  SOCKET: 1024
+[date]:   Allow: localhost/127.0.0.1
+[date]:   Allow command: info
+[date]:   Allow command: log
+[date]:   Allow command: status
+[date]:  PROGRAMS
+[date]:  PROGRAM: p1
+[date]:   Redirecting stdout to /dev/null
+[date]:   Redirecting stderr to /dev/null
+[date]:   No init actions, adding default startup.
+[date]:   Adding default actions.
+.fi
+
+Then the programs are started. The <home> directory and <cmd> are
+displayed, followed by a status line. This line shows the PID of the
+process (P:nnn), the number of times it has been started (S:nnn) and
+how long it has been running (A:nnn).
+
+.nf
+[date]: Starting socket on port 1024.
+[date]: Starting Schedulers.
+[date]: Starting scheduler default
+[date]: START: p1
+[date]:  [./]
+[date]:  [./ct02]
+[date]:  p1 P:5337 S:1 A:00s
+.fi
+
+When a program exits, the following is printed in the log:
+
+.nf
+[date]: ENDED: p2: 5357 0/0
+.fi
+
+This shows the process name (p2), the PID before it ended (5357) and
+the result code/signal it exited with.
+
+This is wat it looks like on exit.
+
+.nf
+{2}
+[date]: ctrl-c
+[date]: Scheduler default ending programs.
+[date]: SIG/15: p1
+[date]: ENDED: p1 P:5358 S:2 A:04s
+[date]: Scheduler exit.
+[date]: PETeR Ready.
+.fi
+
+.SH COMMANDS
+
+.TP 12
+.B
+<status />
+Shows how long 
+.I PETeR
+has been running.
+
+.nf
+echo '<status/>' | pcmd 
+<peter>
+  <running pid="8088" age="02w22h58m48s"></running>
+</peter>
+.fi
+
+.TP 12
+.B
+<info />
+Show a list of programs and information about them.
+
+.nf
+echo '<info/>' | pcmd 4448
+<peter>
+  <scheduler name="default">
+    <program name="P1" pid="16169" starts="16"
+             age="19h26m37s"></program>
+  </scheduler>
+</peter>
+.fi
+
+.TP 12
+.B
+<quit />
+Quits all running programs, and exits
+.I PETeR.
+Note that you will only get a notification that the command was
+received, not when 
+.I PETeR
+actually ended.
+
+.nf
+echo '<quit/>' | pcmd
+<peter>
+  <scheduler name="default">quitting</scheduler>
+</peter>
+.fi
+
+.TP 12
+.B
+<start name="NAME" />
+Starts program with name "NAME".
+
+.TP 12
+.B
+<stop name="NAME" />
+Stops program with name "NAME".
+
+.nf
+echo '<stop name="P1"/>' | pcmd
+<peter>
+  <accepted></accepted>
+</peter>
+.fi
+
+
+.TP 12
+.B
+<log />
+Shows the event log. For each program a log entry is added when the
+program is started, stopped, or crashes. The event log is returned in
+XML format, and looks like this:
+
+.nf
+echo '<log/>' | pcmd
+<peter>
+  <scheduler name="default">
+    <event time="2005/03/15 12:52:24" tstamp="1110887544"
+           type="0" program="SLEEP60" status="0/0">
+    </event>
+  </scheduler>
+</peter>
+.fi
+
+It shows the event time, both in human readable format and UNIX
+format. The type value has the following meaning:
+
+0: Program was started
+
+1: Program ended normally
+
+2: Program was stopped through the socket interface
+
+4: Program crashed
+
+8: Program reached a defined limit
+
+The program attribute shows which program the log entry describes, and
+the status attribute shows the result code/signal with which the
+program exited.
+
+.SH CONFIGURATION
+
+The configuration file is an XML file. It must contain a <general>
+part and a <programs> part.
+
+.SS <general>
+
+In this section, the socket parameters can be specified, and the PID
+file directory can be changed.
+
+First of all, the port
+.I PETeR
+is listening on for commands. The optional allow attribute specifies
+the machines from which connections are accepted. It defaults to
+"localhost". Note that this is also dangerous: anyone who can connect
+to the socket can control
+.I PETeR.
+This is why only the follwing commands are allowed by default:
+
+.nf
+  info
+  log
+  status
+.fi
+
+To allow the other commands, specify them in the "commands"
+attribute. To allow all commands, specify "all".
+
+.nf
+<socket port="1024" />
+<socket port="1024" allow="machine1,localhost" />
+<socket port="1024" commands="stop,start,info,log,status" />
+.fi
+
+The socket declaration must be present, but if you specify 0 (zero)
+for the port number no socket will be opened. This means that
+.I PETeR
+will run without control and can only be stopped by sending a SIGHUP
+to it.
+
+Secondly, the default directory where the PID file is written can be
+changed. The default location is /tmp. The filename is pids_nnnnnn.xml
+where nnnnnn is the PID of the 
+.I PETeR
+process.
+
+.nf
+<pidfile dir="/var/run" />
+.fi
+
+The PID file will be removed when 
+.I PETeR
+exits.
+
+The environment can be cleared by specifying the privileges <priv> tag:
+
+.nf
+<priv clearenv="1" />
+.fi
+
+This will clear the environment and set PATH and IFS to hardcoded values.
+
+In the same tag, privileges can be dropped:
+
+.nf
+<priv uid="1001" />
+.fi
+
+After the config file has been read, the program will run with uid 1001.
+
+Finally, the socket communication can be encrypted with a one time pad.
+The directory where these are stored can be specified like this:
+
+.nf
+<otp keydir="/home/foo/otp/" />
+.fi
+
+You should take good care of the one time pads yourself
+(understatement).  You should also make sure they are really random.
+A perl script is included which generates OTPs from random numbers
+pulled from www.random.org. Never ever reuse a one time pad (really).
+
+.SS <programs>
+
+Definition of all the programs under
+.I PETeR's
+control. In its simplest form:
+
+.nf
+<programs>
+  <program name="p1">
+    <cmd>sleep 10</cmd>
+  </program>
+</programs>
+.fi
+
+A more elaborate example:
+
+.nf
+<programs>
+  <program name="p1">
+    <cmd>./ct02</cmd>
+    <home>./</home>
+    <signal>9</signal>
+    <limit restarts="3" />
+    <redirect stderr="foo.txt" stdout="bar.txt" />
+    <init>
+      <start after="20" />
+    </init>
+    <actions>
+      <exit result="0">
+        <start name="p2" />
+      </exit>
+    </actions>
+  </program>
+</programs>
+.fi
+
+Also, more than one command can be specified. These will be run
+sequentially. When the last one finishes, it starts with the first one
+again. 
+
+.nf
+<programs>
+  <program name="p1">
+    <cmd>sleep 10</cmd>
+    <cmd>sleep 20</cmd>
+  </program>
+</programs>
+.fi
+
+A home directory can be defined. A chdir is done to this directory
+before starting the program.
+
+This program can only be stopped by sending a SIGKILL to it, specified
+with the <signal> parameter.
+
+Normally, the stdout and stderr streams of the program are redirected
+to /dev/null. With the <redirect> command, they can be pointed to a
+file. Both stdout and stderr are specified as attributes.
+
+The number of restarts can be limited with the <limit> parameter. It
+is also possible to define a minimum and maximum runtime.  Should the
+program run shorter than the minimum defined, it will not be
+restarted. This can be used to prevent processes from being restarted
+over and over and over again. If a program runs longer than the
+defined maximum, it will be stopped. In this case, it could be started
+automatically again.
+
+
+.nf
+<limit restarts="3" minruntime="2" />
+.fi
+
+Note that the restarts parameter does not apply to a "normal" start of
+a program, for example as a action or command.
+
+.SH ACTIONS
+
+An action is a simple command that can be executed on startup or on
+exit of a program.
+
+.SS Init Actions
+
+The default, when nothing is specified, is to start the program. Fully
+specified the action looks like this:
+
+.nf
+<init>
+  <start />
+<init>
+.fi
+
+Specify the following to prevent the program from being started:
+
+.nf
+<init />
+.fi
+
+More than one program can be started (or stopped) in an init action:
+
+.nf
+<init>
+ <start name="P1">
+ <start name="P2" after="60" />
+ <stop name="p3">
+ <stop name="P4" after="10" />
+<init>
+
+The after attribute specifies after how many seconds the program
+is started or stopped. The default is immediately.
+
+.SS Exit Actions
+
+The default is to restart the program on crash or exit. This means
+that no matter what the result code is, and no matter how the program
+crashed, it will be restarted. Specific actions can be defined for
+specific exit codes.
+
+To do nothing on a normal exit, specify the following:
+
+.nf
+<actions>
+ <exit result="0" />
+</actions>
+.fi
+
+To specify the same action for more than one result code, a comma
+seperated list can be specified. A range can be specified as well:
+
+.nf
+<actions>
+ <exit result="0,2,3,8-24" />
+</actions>
+.fi
+
+To specify an action on a signal, use the signal attribute instead of
+the result attribute. If you specify "0" for signal, it will catch all
+signals which haven't been specified yet.
+
+.nf
+<actions>
+ <exit signal="15">
+  <start />
+ </exit>
+ <exit signal="0">
+  <start name="P4" />
+ </exit>
+</actions>
+.fi
+
+Similar to the init actions, more than one program can be stopped or
+started. Note that once an action is specified, an explicit <start/>
+must be given to restart the program itself.
+
+.nf
+<actions>
+ <exit result="15">
+   <stop name="P1"/>
+   <start after="10" name="P2" />
+   <start />
+ </exit>
+</actions>
+.fi
+
+To exit
+.I PETeR
+the action <exit /> can be specified.
+
+.nf
+<actions>
+ <exit result="15">
+   <exit />
+ </exit>
+</actions>
+.fi
+
+.SH BUGS
+The programs started by
+.I PETeR
+will end up as zombies when
+.I PETeR
+exits abnormally. In this case, the information in the PID file should
+be used to kill the remaining zombies.
+
+You cannot run
+.I PETeR
+from
+.I PETeR
+
+.SH COPYRIGHT
+Copyright (C) 1999,2005-2006 Peter Berck.
+
+.SH AUTHOR
+.PP
+Peter Berck (duriansoftware@gmail.com)
+

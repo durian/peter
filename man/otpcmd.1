@@ -1,0 +1,41 @@
+.TH otpcmd 1 05/03/2005 "DurianSoftware PETeR"
+
+.SH OTPCMD
+PETeR command \- send an OTP encrypted XML command to PETeR.
+
+.SH SYNOPSIS
+.BI "echo '<info />' | otpcmd -p 4048 -k otps/otp000.txt"
+
+Options:
+.BI "[\-h " host ]
+.BI "[\-k " keypad ]
+.BI "[\-p " port ]
+
+.SH DESCRIPTION
+.I otpcmd
+echoes a command to
+.I PETeR.
+The output from 
+.I PETeR
+is echoed back. It is encrypted on the way.
+
+You can get the following error returned:
+.nf
+Keyfile problem.
+.fi
+
+
+.nf
+ERROR: keyfile too short.
+.fi
+
+.SH BUGS
+Not known.
+
+.SH COPYRIGHT
+Copyright (C) 2005-2006 Durian Software.
+
+.SH AUTHOR
+.PP
+Peter Berck (duriansoftware@gmail.com)
+

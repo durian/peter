@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" version="-//W3C//DTD XHTML 1.1//EN" xml:lang="en">
+<head>
+<!-- -->
+<!--
+PETeR
+-->
+<script type="text/javascript" src="js/mootools.v1.11pckr.js"></script>
+<!-- -->
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<meta name="author" content="Peter Berck" />
+<meta name="copyright" content="Peter Berck" />
+<meta name="description" content="PETeR" />
+<meta name="keywords" content="PETeR" />
+<!-- -->
+<title>PETeR</title>
+<!-- -->
+<style type="text/css" media="screen">@import 'peter.css';</style>
+<!-- -->
+<script type="text/javascript">
+window.addEvent('domready', function() {
+  window.addEvent( 'load', function() {
+    get_info();
+    get_info.periodical(60000);
+  });
+});
+
+function get_info() {
+  var aRequest = new XHR();
+  var obj = $('outputbox');
+  //obj.setHTML( '<img src="images/loading.gif" />' );
+
+  aRequest.addEvent('onSuccess',function() {
+	  var new_obj = $('outputbox');
+	  new_obj.setHTML( aRequest.response.text );
+      });
+
+  aRequest.addEvent('onFailure',function() {
+	  var new_obj = $('outputbox');
+	  new_obj.setHTML( "An error occurred." );
+      });
+
+  aRequest.send( 'parse2.php' );
+}
+
+</script>
+<!-- -->
+</head>
+<body>
+<div id="page">
+
+<div id="container1">
+  
+<h1 id="title">PETeR</h1>
+
+<div id="outputbox">
+</div>
+
+</div><!-- container -->
+
+</div><!-- page -->
+</body>
+</html>

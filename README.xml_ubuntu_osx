@@ -1,0 +1,11 @@
+XML problems
+------------
+
+To compile PETeR, the expat XML libraries and header files are
+needed. These are not present on a standard Ubuntu or OS X installation.
+
+For Ubuntu, "expat" and "expat dev" should be installed.
+
+For OS X, the library can be downloaded from sourceforge. A standard
+"configure", "make" and "make install" should be enough.
+

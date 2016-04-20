@@ -1,0 +1,39 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(peter, 1.1.4)
+AC_CONFIG_SRCDIR(src/main.cc)
+AM_INIT_AUTOMAKE
+
+AC_PROG_CXX
+#AC_PROG_CXX_EXCEPTIONS()
+
+AC_ARG_WITH(expat,
+        [  --with-expat=<path>    prefix of expat installation],
+        [
+                CPPFLAGS="$CPPFLAGS -I$withval/include"
+                LDFLAGS="$LDFLAGS -L$withval/lib"
+                LIBS=" $LIBS -L$withval/lib -lexpat "
+                AC_DEFINE_UNQUOTED(EXPAT,"$withval",[ Have Expat ])
+        ]
+dnl,
+dnl     [
+dnl             AC_MSG_ERROR([Expat is required, use --with-expat=<path>])
+dnl     ]
+)
+
+# OS X has no clearenv
+AC_CHECK_FUNCS(clearenv)
+
+dnl Checks for header files.
+AC_HAVE_HEADERS(expat.h)
+
+AC_CHECK_LIB(expat, XML_ParserCreate, LDFLAGS="$LDFLAGS -lexpat",
+             AC_MSG_ERROR(expat lib not found))
+
+#AC_CHECK_SYMBOL(XML_STATUS_ERROR, expat.h, LDFLAGS="$LDFLAGS -lexpat",
+#             AC_MSG_ERROR(wrong (too old) version of expat.h))
+
+AC_HAVE_HEADERS(pthread.h)
+AC_CHECK_LIB(pthread, pthread_create, LDFLAGS="$LDFLAGS -lpthread",
+             AC_MSG_ERROR(pthread lib not found))
+
+AC_OUTPUT(Makefile)

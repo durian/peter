@@ -1,0 +1,12 @@
+<peter>
+  <general>
+    <socket port="8800" commands="all" allow="localhost" />
+    <priv clearenv="1" />
+  </general>
+  <programs>
+    <program name="SLEEP">
+      <cmd>sleep 10</cmd>
+      <init />
+    </program>
+  </programs>
+</peter>

@@ -1,0 +1,278 @@
+Introduction
+============
+
+PETeR is a program that starts any number of programs and can be
+scripted to take a certain action when they exit. Different actions
+can be taken depending on exit code.
+
+PETeR is useful when you want to keep a system that is made up of
+a number of smaller sub-systems running. It can also be used as a
+system monitor tool. Together with the main program(s), monitoring
+programs or scripts can be started which trigger different kind of
+actions when things go wrong.
+
+PETeR can be controlled with commands in XML format through a
+socket interface. Apart from getting status information, programs can
+be stopped and started through this interface. This makes it possible
+to monitor and control a system running on a remote computer.
+
+Getting info
+============
+
+Information can be obtained by sending an XML command to the socket
+PETeR is listening on. Use the supplied "pcmd" program as
+explained in the following examples.
+
+1) Status
+---------
+
+To check if PETeR is running:
+
+echo '<status/>' | pcmd 1024
+
+<peter>
+  <running pid="14223" age="01m19s"></running>
+</peter>
+
+2) Info
+-------
+
+Get info about running processes:
+
+echo '<info/>' | pcmd 1024
+
+<peter>
+  <scheduler name="default">
+    <program name="p1" pid="30353" starts="2" age="40s"></program>
+  </scheduler>
+</peter>
+
+3) Log
+------
+
+Get a log of evens:
+
+echo '<log/>' | pcmd 1024
+
+<peter>
+  <scheduler name="default">
+    <event time="2005/03/09 11:03:12" tstamp="1110362592" type="0" program="p1"
+           status="0/0"></event>
+    <event time="2005/03/09 11:04:12" tstamp="1110362652" type="1" program="p1"
+           status="0/0"></event>
+    <event time="2005/03/09 11:04:12" tstamp="1110362652" type="0" program="p1"
+           status="0/0"></event>
+  </scheduler>
+</peter>
+
+An event is a program starting or exiting. The following is logged:
+
+1) time   : the time the event took place.
+2) tstamp : the event time in UNIX format.
+3) type   : 0 -> program was started.
+            1 -> program exited normally.
+	    2 -> program was stopped by user command.
+	    4 -> program crashed.
+            8 -> program reached a limit and is not restarted.
+4) program: the program the event is about.
+5) status : the result code/signal which caused the exit. This value is "0/0"
+            for a program start.
+
+Quitting
+========
+
+PETeR can be quit in two ways. First of all, if it is running in
+the forground, a control-C will stop it. Alternatively, a quit command
+can be sent to the socket interface like this:
+
+echo '<quit/>' | pcmd 1024
+
+In both cases, PETeR will send a SIGHUP to the programs under its
+control. Programs that are still running after ten seconds will get a
+SIGKILL. When all programs have stopped, PETeR will exit.
+
+Examples
+========
+
+1) Simplest form
+----------------
+
+PETeR controls one program, which is restarted as soon as it
+exits (we'll take a one minute sleep as example). The configuration
+file looks as follows:
+
+<peter>
+  <general>
+    <socket port="1024" />
+  </general>
+  <programs>
+    <program name="p1">
+      <cmd>sleep 60</cmd>
+    </program>
+  </programs>
+</peter>
+
+Running peter will produce the following output:
+
+20050309 10:59:37.90: PETeR started.
+20050309 10:59:37.90:  PID:  30314 PPID:  29791
+20050309 10:59:37.90:  UID:   1704 EUID:   1704
+20050309 10:59:37.90:  GID:    119 EGID:    119
+20050309 10:59:37.90: Config file: etc/c6.xml
+20050309 10:59:37.90:  GENERAL
+20050309 10:59:37.90:  Default scheduler.
+20050309 10:59:37.90:  Logging to screen.
+20050309 10:59:37.90:  PID file: /tmp/pids_030314.xml
+20050309 10:59:37.90:  SOCKET: 1024
+20050309 10:59:37.99:   Allow: localhost/127.0.0.1
+20050309 10:59:37.99:   Allow command: info
+20050309 10:59:37.99:   Allow command: log
+20050309 10:59:37.99:   Allow command: status
+20050309 10:59:37.99:  PROGRAMS
+20050309 10:59:37.99:  PROGRAM: p1
+20050309 10:59:37.99:   Redirecting stdout to /dev/null
+20050309 10:59:37.99:   Redirecting stderr to /dev/null
+20050309 10:59:37.99:   No init actions, adding default startup.
+20050309 10:59:37.99:   Adding default actions.
+20050309 10:59:37.99: Starting socket on port 1024.
+20050309 10:59:37.99: Starting Schedulers.
+20050309 10:59:37.99: Starting scheduler default
+20050309 10:59:37.99: START: p1
+20050309 10:59:37.99:  [./]
+20050309 10:59:37.99:  [sleep 60]
+20050309 10:59:37.99:  BINARY: /bin/sleep
+20050309 10:59:37.99:  p1 P:30318 S:1 A:00s
+
+The last line shows the following:
+
+ p1 P:30318 S:1 A:00s
+ |  |       |   |
+ program name   |
+    |       |   |
+    PID of process
+            |   |
+            Started once
+                |
+                Age, ie running for 0 seconds
+
+(One minute later, the command exits, and is restarted)
+
+20050309 11:00:38.00: ENDED: p1: 30318 0/0 01m01s
+20050309 11:00:38.00: START: p1
+20050309 11:00:38.00:  [./]
+20050309 11:00:38.00:  [sleep 60]
+20050309 11:00:38.00:  BINARY: /bin/sleep
+20050309 11:00:38.00:  p1 P:30343 S:2 A:00s
+
+The status line ("ENDED:") shows the following:
+
+ p1: 30318 0/0 01m01s
+ |   |     |   |
+ program name  |
+     |     |   |
+     PID of process before it died
+           |   |
+           Result code/signal (0/0 means normal exit)
+               |
+               Time this program ran
+
+To quit, we press control-C:
+
+{2}
+20050309 11:01:05.74: ctrl-c
+20050309 11:01:05.74: Scheduler default ending programs.
+20050309 11:01:05.74: SIG/15: p1
+20050309 11:01:05.75: ENDED: p1 P:30343 S:2 A:27s
+20050309 11:01:05.75: Scheduler exit.
+20050309 11:01:05.83: PETeR Ready.
+
+2) Monitoring example
+---------------------
+
+A program is running, together with a diskspace monitor. When the
+diskspace becomes critical the monitor exits with result code 1. This
+in turn stops the main program and starts a diskcleaning program. When
+this is ready the main program and the monitor are started again.
+
+The configuration looks as follows:
+
+<peter>
+  <general>
+    <socket port="1024" />
+  </general>
+  <programs>
+    <program name="p1">
+      <cmd>/usr/local/bin/bigprogram</cmd>
+    </program>
+    <program name="diskspace">
+      <cmd>/usr/scripts/diskspace.sh</cmd>
+      <actions>
+	<exit result="1">
+	  <stop name="p1" />
+	  <start name="diskcleaner" />
+	</exit>
+      </actions>
+    </program>
+    <program name="diskcleaner">
+      <cmd>/usr/scripts/diskcleaner.sh</cmd>
+      <init /> <!-- don't start up -->
+      <actions>
+	<exit result="0">
+	  <start name="p1" />
+	  <start name="diskspace" />
+	</exit>
+      </actions>
+    </program>
+  </programs>
+</peter>
+
+3) Crash Notification
+---------------------
+
+Program P1 is started. When it crashes, it is restarted, and at the
+same time the FailNotification program is started. When the
+FailNotification program exists it waits. Note that the UTC, NAME, RES
+and SIG strings are changed into the real values when the program is
+started.
+
+<programs>
+  <program name="P1">
+    <cmd>...</cmd>
+    <actions>
+      <exit signal="0">
+        <start name="FailNotification" />
+        <start/>
+      </exit>
+    </actions>
+  </program>
+  <program name="FailNotification">
+    <cmd>mail -text "UTC:Program NAME failed (RES/SIG)."</cmd>
+    <init />
+    <actions>
+      <exit result="0" />
+    </actions>
+  </program>
+</programs>
+
+4) Periodic Status
+------------------
+
+The status-mailer is started after ten seconds, and then repeatedly
+every 120 seconds.
+
+<programs>
+  <program name="P1">
+    <cmd>...</cmd>
+  </program>
+  <program name="PeriodicStatus">
+    <cmd>./ml.pl -m info</cmd>
+    <init>
+      <start after="10" />
+    </init>
+    <actions>
+      <exit result="0">
+        <start after="120" />
+      </exit>
+    </actions>
+  </program>
+</programs>

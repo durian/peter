@@ -1,0 +1,15 @@
+<peter>
+  <general>
+    <socket port="8800" commands="all" allow="localhost" />
+  </general>
+  <programs>
+    <program name="SLEEP">
+      <cmd><![CDATA[sleep 10]]></cmd>
+      <actions>
+       <exit result="0">
+        <exit />
+       </exit>
+      </actions>
+    </program>
+  </programs>
+</peter>

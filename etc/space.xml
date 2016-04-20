@@ -1,0 +1,15 @@
+<peter>
+  <general>
+    <socket port="8800" commands="all" allow="localhost" />
+    <priv clearenv="1" />
+  </general>
+  <programs>
+    <program name="ECHO">
+      <home>/Users/pberck/uvt/wopr/test_other/pdt</home>
+      <cmd1>/Users/pberck/uvt/wopr/wopr -l -r pdt2web -p lc0:8,timbl0:'-a1 +D',ibasefile0:nyt.3e7.10000.lt8m1_-a1+D.ibase,lc1:2,timbl1:'-a1 +D',ibasefile1:dummy.l2r0_-a1+D.ibase,dl:f,users:10</cmd1>
+      <cmd>/Users/pberck/uvt/wopr/wopr -r woprtest</cmd>
+      <limit minruntime="2" />
+      <redirect stderr="foo.txt" stdout="bar.txt" />
+    </program>
+  </programs>
+</peter>

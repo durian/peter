@@ -1,0 +1,11 @@
+<peter>
+  <general>
+    <socket port="8800" commands="all" allow="localhost" />
+  </general>
+  <programs>
+    <program name="SLEEP">
+      <cmd>slieep 10</cmd>
+      <limit maxruntime="20" />
+    </program>
+  </programs>
+</peter>

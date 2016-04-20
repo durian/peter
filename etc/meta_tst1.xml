@@ -1,0 +1,12 @@
+<peter>
+  <general>
+    <socket port="8801" commands="all" allow="localhost" />
+  </general>
+  <programs>
+    <program name="PETERM">
+      <cmd>peter config.xml</cmd>
+      <limit maxruntime="5" />
+      <signal>1</signal>
+    </program>
+  </programs>
+</peter>

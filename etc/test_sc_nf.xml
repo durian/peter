@@ -1,0 +1,11 @@
+<peter>
+  <general>
+    <socket port="8800" commands="all" allow="localhost" />
+  </general>
+  <programs>
+    <program name="PING">
+      <cmd>sh etc/test_sc_nf.sh</cmd>
+      <limit restarts="20" />
+    </program>
+  </programs>
+</peter>
