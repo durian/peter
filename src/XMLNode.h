@@ -83,7 +83,7 @@ class XMLNode {
   void add_attribute(AttVal*);
   void add_attribute(const std::string&, const std::string&);
   void add_rep_attribute(const std::string&, const std::string&);
-  std::string get_attribute(const std::string&) throw(XMLError);
+  std::string get_attribute(const std::string&) /*throw(XMLError)*/;
   std::string get_attribute(const std::string&, const std::string&);
   void set_attribute(const std::string&, const std::string&);
   void add_child(XMLNode *x);
@@ -116,12 +116,12 @@ class XMLNode {
   XMLNode *get_next_child(const std::string&);
   XMLNode *get_first_child(int);
   XMLNode *get_next_child(int);
-  std::string find_contents(const std::string&) throw (XMLError);
-  std::string get_contents(const std::string&) throw(XMLError);
-  XMLNode *get_child(const std::string&) throw(XMLError);
+  std::string find_contents(const std::string&) /*throw (XMLError)*/;
+  std::string get_contents(const std::string&) /*throw(XMLError)*/;
+  XMLNode *get_child(const std::string&) /*throw(XMLError)*/;
   std::string find_contents(const std::string&, const std::string&);
   bool tag_present(const std::string);
-  XMLNode *get_named_child(const std::string) throw (XMLError);
+  XMLNode *get_named_child(const std::string) /*throw (XMLError)*/;
   XMLNode *get_named_child(const std::string, XMLNode*);
   std::vector<XMLNode*> get_children(const std::string);
 

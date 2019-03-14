@@ -30,8 +30,6 @@
 
 // ----------------------------------------------------------------------------
 
-int stoi(const std::string& str);
-long stol(const std::string& str);
 std::string secs_to_str(long);
 std::string secs_to_str(long, long);
 std::string to_str(int);
@@ -61,7 +59,7 @@ inline std::string &replacein(std::string &s, const std::string &sub,
   return s;
 }
 
-std::string askenv(const std::string& key) throw(std::invalid_argument);
+std::string askenv(const std::string& key) /*throw(std::invalid_argument)*/;
 
 std::string itoa(int i,const char* form);
 

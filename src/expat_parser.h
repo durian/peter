@@ -53,7 +53,7 @@ extern "C" {
   static void contents(void *data, const XML_Char *s, int len);
 }
 
-XMLNode *parse_string(const std::string) throw(ParseError);
+XMLNode *parse_string(const std::string) /*throw(ParseError)*/;
 XMLNode *parse_file(const std::string);
 std::string read_file(std::string);
 

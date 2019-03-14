@@ -203,7 +203,7 @@ void XMLNode::add_rep_attribute(const std::string& a, const std::string& v) {
 /*!
   Returns the value of the specified attribute.
 */
-std::string XMLNode::get_attribute(const std::string& att_name) throw(XMLError) {
+std::string XMLNode::get_attribute(const std::string& att_name) /*throw(XMLError)*/ {
   std::vector<AttVal*>::iterator si;
   for (si = attributes.begin(); si != attributes.end(); ++si) {
     AttVal *tmp = *si;
@@ -600,7 +600,7 @@ XMLNode *XMLNode::get_next_child(int type) {
 /*!
   Breadth-first search for named node. Only first level children.
 */
-std::string XMLNode::find_contents(const std::string& node_name) throw(XMLError) {
+std::string XMLNode::find_contents(const std::string& node_name) /*throw(XMLError)*/ {
   XMLNode *temp = get_first_child();
   while (temp != NULL) {
     if (temp->name == node_name) {
@@ -623,7 +623,7 @@ std::string XMLNode::find_contents(const std::string& node_name) throw(XMLError)
 /*!
   Returns contents specified like "peter general redirect"
 */
-std::string XMLNode::get_contents(const std::string& node_path) throw(XMLError) {
+std::string XMLNode::get_contents(const std::string& node_path) /*throw(XMLError)*/ {
   std::string::size_type s_pos = 0;
   std::string::size_type s_pos_p = 0;
   XMLNode *tmp = this;
@@ -638,8 +638,8 @@ std::string XMLNode::get_contents(const std::string& node_path) throw(XMLError) 
 /*!
   Returns node specified like "peter general redirect"
 */
-XMLNode *XMLNode::get_child(const std::string& node_path) throw(XMLError) {
-  std::string::size_type s_pos = 0;
+XMLNode *XMLNode::get_child(const std::string& node_path) /*throw(XMLError)*/ {
+  std::string::size_type s_pos   = 0;
   std::string::size_type s_pos_p = 0;
   XMLNode *tmp = this;
 
@@ -703,7 +703,7 @@ bool XMLNode::tag_present(const std::string node_name) {
 /*!
   Returns a pointer to the first child, or throws error.
 */
-XMLNode *XMLNode::get_named_child(const std::string a_name) throw (XMLError) {
+XMLNode *XMLNode::get_named_child(const std::string a_name) /*throw (XMLError)*/ {
   XMLNode *temp = get_first_child();
   while (temp != NULL) {
     if (temp->name == a_name) {

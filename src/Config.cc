@@ -107,7 +107,7 @@ void Config::read_config( const std::string filename ) {
 	std::string s_name = s_xml->get_attribute( "name", "??" );
 	Scheduler *sched = new Scheduler( s_name );
 	lf->log( "Scheduler: " + s_name );
-	long rate = stol( s_xml->get_attribute( "rate", "0" ) );
+	long rate = std::stol( s_xml->get_attribute( "rate", "0" ) );
 	if ( rate > 0L ) {
 	  lf->log( "Rate: " + to_str(rate) );
 	  sched->set_rate( rate );
@@ -139,12 +139,12 @@ void Config::read_config( const std::string filename ) {
       if ( priv_xml != NULL ) {
 	std::string priv_uid = priv_xml->get_attribute( "uid", "0" );
 	if ( priv_uid != "0" ) {
-	  s_uid = stoi( priv_uid );
+	  s_uid = std::stoi( priv_uid );
 	  lf->log( "UID: " + priv_uid );
 	}
 	std::string priv_gid = priv_xml->get_attribute( "gid", "0" ); 
 	if ( priv_gid != "0" ) {
-	  s_gid = stoi( priv_gid );
+	  s_gid = std::stoi( priv_gid );
 	  lf->log( "GID: " + priv_gid );
 	}
 #ifdef HAVE_CLEARENV
@@ -217,7 +217,7 @@ void Config::read_config( const std::string filename ) {
     //
     XMLNode *sock_xml = general->get_named_child( "socket" );
     if ( sock_xml != NULL ) {
-      port = stoi( sock_xml->get_attribute( "port", "2048" ));
+      port = std::stoi( sock_xml->get_attribute( "port", "2048" ));
       if ( port > 0 ) {
 	lf->log( "SOCKET: " + to_str(port) );
 	std::string a = sock_xml->get_attribute( "allow", "localhost" );
@@ -268,7 +268,7 @@ void Config::read_config( const std::string filename ) {
 	cmd_list = prog->get_next_child();
       }
       p->set_home( prog->find_contents( "home", "./" ) );
-      p->set_stop_sig( stoi( prog->find_contents( "signal", "15" ) ) );
+      p->set_stop_sig( std::stoi( prog->find_contents( "signal", "15" ) ) );
 
       XMLNode *rdr_xml = prog->get_named_child( "redirect", NULL );
       std::string rdr_cout = "/dev/null";
@@ -284,17 +284,17 @@ void Config::read_config( const std::string filename ) {
 
       XMLNode *lim_xml = prog->get_named_child( "limit", NULL );
       if ( lim_xml != NULL ) {
-	int limit = stoi( lim_xml->get_attribute( "restarts", "-1" ) );
+	int limit = std::stoi( lim_xml->get_attribute( "restarts", "-1" ) );
 	p->set_limit( LIMIT_STARTS, limit );
 	if ( limit != -1 ) {
 	  lf->log( "Limit restarts: " + to_str( p->get_limit(LIMIT_STARTS) ));
 	}
-	limit = stoi( lim_xml->get_attribute( "minruntime", "-1" ) );
+	limit = std::stoi( lim_xml->get_attribute( "minruntime", "-1" ) );
 	p->set_limit( LIMIT_MINRUNTIME, limit );
 	if ( limit != -1 ) {
 	  lf->log( "Limit min runtime: " + to_str( p->get_limit(LIMIT_MINRUNTIME) ));
 	}
-	limit = stoi( lim_xml->get_attribute( "maxruntime", "-1" ) );
+	limit = std::stoi( lim_xml->get_attribute( "maxruntime", "-1" ) );
 	p->set_limit( LIMIT_MAXRUNTIME, limit );
 	if ( limit != -1 ) {
 	  lf->log( "Limit max runtime: " + to_str( p->get_limit(LIMIT_MAXRUNTIME) ));
@@ -361,13 +361,13 @@ void Config::read_config( const std::string filename ) {
 	    
 	    if ( cmds_xml->get_name() == "start" ) {
 	      a = new Action( AXN_EXEC );
-	      a->add_l_attrib( "after", stol( after ));
+	      a->add_l_attrib( "after", std::stol( after ));
 	      a->add_s_attrib( "prog", prog );
 	    }
 
 	    if ( cmds_xml->get_name() == "stop" ) {
 	      a = new Action( AXN_KILL );
-	      a->add_l_attrib( "after", stol( after ));
+	      a->add_l_attrib( "after", std::stol( after ));
 	      a->add_s_attrib( "prog", prog );
 	    }
 
@@ -394,14 +394,14 @@ void Config::read_config( const std::string filename ) {
 	      if ( pos != std::string::npos ) { // a-b range
 		std::vector<std::string> range_parts;
 		Tokenize( tmp, range_parts, '-' );
-		int range_begin = stoi( range_parts[0] );
-		int range_end   = stoi( range_parts[1] );
+		int range_begin = std::stoi( range_parts[0] );
+		int range_end   = std::stoi( range_parts[1] );
 		for ( sig = range_begin; sig <= range_end; sig++ ) {
 		  p->add_sig_action( sig, al );
 		}
 		lf->log( "Action for result " + tmp );
 	      } else {
-		sig = stoi( tmp );
+		sig = std::stoi( tmp );
 		p->add_sig_action( sig, al );
 		lf->log( "Action for signal " + to_str(sig));
 	      }
@@ -417,14 +417,14 @@ void Config::read_config( const std::string filename ) {
 	      if ( pos != std::string::npos ) { // a-b range
 		std::vector<std::string> range_parts;
 		Tokenize( tmp, range_parts, '-' );
-		int range_begin = stoi( range_parts[0] );
-		int range_end   = stoi( range_parts[1] );
+		int range_begin = std::stoi( range_parts[0] );
+		int range_end   = std::stoi( range_parts[1] );
 		for ( res = range_begin; res <= range_end; res++ ) {
 		  p->add_res_action( res, al );
 		}
 		lf->log( "Action for result " + tmp );
 	      } else {
-		res = stoi( tmp );
+		res = std::stoi( tmp );
 		p->add_res_action( res, al );
 		lf->log( "Action for result " + to_str(res));
 	      }

@@ -49,22 +49,6 @@
 //-----------------------------------------------------------------------------
 
 /*!
-  Converts a string to an integer (atoi)
-*/
-int stoi(const std::string& str) {
-  int i = atoi( str.c_str() );
-  return( i );
-}
-
-/*!
-  Converts a string to a long.
-*/
-long stol(const std::string& str) {
-  long i = atol( str.c_str() );
-  return( i );
-}
-
-/*!
   Converts seconds to 03w03d02h33m48s
 */
 std::string secs_to_str( long t ) {
@@ -196,19 +180,19 @@ std::string the_date_time_utc(long s) {
 */
 long parse_date_time(const std::string& d) {
   if ( d.length() == 5 ) { // time only
-    int hh = stoi( d.substr(0, 2) );
-    int mm = stoi( d.substr(3, 2) );
+    int hh = std::stoi( d.substr(0, 2) );
+    int mm = std::stoi( d.substr(3, 2) );
     long s = hh * 3600L + mm * 60L;
     return s;
   }
   if ( d.length() < 16 ) {
     return  0L ;
   }
-  int yy = stoi( d.substr(0, 4) );
-  int mm = stoi( d.substr(5, 2) );
-  int dd = stoi( d.substr(8, 2) );
-  int hh = stoi( d.substr(11, 2) );
-  int mn = stoi( d.substr(14, 2) );
+  int yy = std::stoi( d.substr(0, 4) );
+  int mm = std::stoi( d.substr(5, 2) );
+  int dd = std::stoi( d.substr(8, 2) );
+  int hh = std::stoi( d.substr(11, 2) );
+  int mn = std::stoi( d.substr(14, 2) );
   
   struct tm t_s;
   extern time_t timezone;

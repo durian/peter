@@ -87,7 +87,7 @@ static void contents(void *data, const XML_Char *s, int len) {
   dat->current_node->set_contents( n );
 }
 
-XMLNode *parse_string(const std::string s) throw(ParseError) {
+XMLNode *parse_string(const std::string s) /*throw(ParseError)*/ {
   if ( s.length() < 3 ) {
     throw ParseError( "Parse error!" );
   }

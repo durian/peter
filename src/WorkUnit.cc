@@ -62,12 +62,12 @@ WorkUnit::WorkUnit( XMLNode *xml ) {
   if ( xml->get_name() == "start" ) {
     w_type = WT_RUN_PROG;
     std::string after = xml->get_attribute( "after", "0" );
-    t_at = utc() + stol( after );
+    t_at = utc() + std::stol( after );
   }
   if ( xml->get_name() == "stop" ) {
     w_type = WT_END_PROG;
     std::string after = xml->get_attribute( "after", "0" );
-    t_at = utc() + stol( after );
+    t_at = utc() + std::stol( after );
   }
   if ( xml->get_name() == "nostart" ) {
     w_type = WT_NOSTART;
