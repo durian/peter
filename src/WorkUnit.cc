@@ -79,8 +79,18 @@ WorkUnit::WorkUnit( XMLNode *xml ) {
   }
   if ( xml->get_name() == "stop" ) {
     w_type = WT_END_PROG;
-    std::string after = xml->get_attribute( "after", "0" );
-    t_at = utc() + std::stol( after );
+    std::string at = xml->get_attribute( "at", "0" ); // 2019-03-05 05:55:28
+    if ( at.length() == 19 ) {
+      struct tm tm;
+      memset( &tm, 0, sizeof tm );
+      t_at = utc(); 
+      if ( strptime(at.c_str(), "%Y-%m-%d %H:%M:%S", &tm) ) {
+	t_at = mktime( &tm );
+      }
+    } else {
+      std::string after = xml->get_attribute( "after", "0" );
+      t_at = utc() + std::stol( after );
+    }
   }
   if ( xml->get_name() == "nostart" ) {
     w_type = WT_NOSTART;
