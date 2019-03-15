@@ -176,7 +176,7 @@ void Logfile::log( std::string s ) {
 void Logfile::log( std::string s, int sl ) {
   log( s );
   if ( sl != 0 ) {
-    syslog( LOG_INFO, &(s[0]) );
+    syslog( LOG_INFO, "%s", s.c_str() );
   }
 }
 
