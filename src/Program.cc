@@ -162,8 +162,8 @@ void Program::run( Scheduler* s ) {
   if ( pos != std::string::npos ) {
     bin = bin.substr(0, pos);
     arg = cmd.substr(pos+1);
-    log->log(bin);
-    log->log(arg);
+    //log->log(bin);
+    //log->log(arg);
   }
 
   // What if absolute path?
@@ -251,7 +251,7 @@ void Program::run( Scheduler* s ) {
     perror( "fork" );
     exit(1);
   }
-
+  
   if ( pid == 0 ) { //child
 
     // HAIRY code.
@@ -280,7 +280,8 @@ void Program::run( Scheduler* s ) {
     //args[0][0] = '\0';
 
     //execvp( *args, args ); // replace us.
-    execlp( bincp, cmdcp, (char*)NULL ); // replace us.
+    //execlp( bincp, cmdcp, (char*)NULL ); // replace us.
+    execlp( bincp, cmdcp, argcp, (char*)NULL ); // replace us.
     perror( *args );
     _exit(17);
   } // pid == 0
