@@ -39,6 +39,8 @@
 #include <sstream>
 #include <ctime>
 
+#include <string.h>
+
 #include "WorkUnit.h"
 #include "Program.h"
 #include "XMLNode.h"
