@@ -114,7 +114,7 @@ extern "C" void* scheduler( void *params ) {
 	Program *p = wu->program;
 	if ( delta <= 0L ) {
 	  l->log( "Stopping: " + p->get_name() );
-	  p->set_stop_mode( 1 ); // prevent what_next() because on purpose
+	  p->set_stop_mode( 0 ); // WAS 1, to prevent what_next() because on purpose
 	  s->elist->add_event( new Event(now, EVT_STOP, p, -1) );
 	  // Make a "wait" work unit. NO
 	  //

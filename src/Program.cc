@@ -165,6 +165,10 @@ void Program::run( Scheduler* s ) {
     //log->log(bin);
     //log->log(arg);
   }
+  // these end up in stdout:
+  //log->log( "--cmdcp ["+std::string(cmd)+"]." );
+  //log->log( "--bincp ["+std::string(bin)+"]." );
+  //log->log( "--argcp ["+std::string(arg)+"]." );
 
   // What if absolute path?
   //
@@ -272,16 +276,24 @@ void Program::run( Scheduler* s ) {
       _exit( 27 );
     }
 
-    char *args[64];
+    char *args[256];
     char *cmdcp = strdup( cmd.c_str() );
     char *bincp = strdup( bin.c_str() );
     char *argcp = strdup( arg.c_str() );
-    //arg_split( cmdcp, args );
+    arg_split( cmdcp, args );
     //args[0][0] = '\0';
 
+    //log->log( "cmdcp ["+std::string(cmd)+"]." );
+    //log->log( "bincp ["+std::string(bin)+"]." );
+    //log->log( "argcp ["+std::string(arg)+"]." );
+
+    // ls -l
+    // execlp("ls", "ls", "-l", "/", (char *)NULL);
+
+    execvp( *args, args );
     //execvp( *args, args ); // replace us.
-    //execlp( bincp, cmdcp, (char*)NULL ); // replace us.
-    execlp( bincp, cmdcp, argcp, (char*)NULL ); // replace us.
+    //execlp( bincp, bincp, argcp, (char*)NULL ); // replace us.
+    ////execlp( bincp, cmdcp, argcp, (char*)NULL ); // replace us.
     perror( *args );
     _exit(17);
   } // pid == 0

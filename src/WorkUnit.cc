@@ -91,7 +91,7 @@ WorkUnit::WorkUnit( XMLNode *xml ) {
       }
     } else {
       std::string after = xml->get_attribute( "after", "0" );
-      t_at = utc() + std::stol( after );
+      t_at = utc() + std::stol( after ); // SHOULD BE RELATIVE TO START TIME
     }
   }
   if ( xml->get_name() == "nostart" ) {
