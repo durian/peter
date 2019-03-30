@@ -1,0 +1,20 @@
+<peter>
+  <general>
+    <socket port="8800" commands="all" allow="localhost" />
+  </general>
+  <programs>
+    <program name="SLEEP">
+      <cmd>sleep 60</cmd>
+      <cmd>sleep 10</cmd>
+      <limit maxruntime="12" />
+     <init>
+       <start at="2019-03-28 21:55:28" />
+       <!-- <stop at="2019-03-28 21:45:00" /> -->
+     </init>
+     <actions>
+       <exit result="0" />
+     </actions>
+    </program>
+
+  </programs>
+</peter>

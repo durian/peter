@@ -1,0 +1,36 @@
+<peter>
+  <general>
+    <socket port="8800" commands="all" allow="localhost" />
+  </general>
+  <programs>
+
+    <program name="PTEST">
+      <cmd>sh ./launch.sh 1</cmd>
+      <!-- <signal>9</signal> -->
+      <redirect stderr="rectest_stderr.txt" stdout="rectest_stdout.txt" />
+      <limit maxruntime="120" />
+      <!--
+      <init>
+	<start at="2019-03-28 22:07:00" />
+      </init>
+      -->
+      <actions>
+        <exit signal="15"> <!-- we kill with 15 -->
+          <start name="ENCODE" />
+        </exit>
+      </actions>
+    </program>
+
+    <program name="ENCODE">
+      <cmd>killall acestreamengine</cmd>
+      <cmd>bash ./convert.bash /home/pberck/latest.ts ptest.mp4</cmd>
+      <!-- <signal>9</signal> -->
+      <redirect stderr="rectest_stderr.txt" stdout="rectest_stdout.txt" />
+      <init /> <!-- don't start automaticall -->
+      <actions>
+        <exit />
+      </actions>
+    </program>
+
+  </programs>
+</peter>

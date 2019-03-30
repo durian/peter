@@ -1,0 +1,83 @@
+<peter>
+  <general>
+    <socket port="8800" commands="all" allow="localhost" />
+  </general>
+  <programs>
+<!--
+p1  2019-03-29 12:00:00
+p2  2019-03-29 16:00:00
+p3  2019-03-30 13:00:00
+q   2019-03-30 16:00:00
+r   2019-03-31 17:05:00
+
+If past time, it starts.... FIX?
+-->
+<!--
+    <program name="P1">
+      <cmd>sh ./launch.sh</cmd>
+      <cmd>bash ./convert.bash /home/pberck/latest.ts p1.mp4</cmd>
+      <limit maxruntime="5400" />
+      <init>
+	<start at="2019-03-29 12:00:00" />
+      </init>
+      <actions>
+	<exit result="0" />
+      </actions>
+    </program>
+
+    <program name="P2">
+      <cmd>sh ./launch.sh</cmd>
+      <cmd>bash ./convert.bash /home/pberck/latest.ts p2.mp4</cmd>
+      <limit maxruntime="5400" />
+      <init>
+	<start at="2019-03-29 16:00:00" />
+      </init>
+      <actions>
+	<exit result="0" />
+      </actions>
+    </program>
+-->
+    <program name="P3">
+      <cmd>sh ./launch.sh</cmd>
+      <limit maxruntime="3660" />
+      <init>
+	<start at="2019-03-30 13:00:00" />
+      </init>
+      <actions>
+        <exit signal="15"> <!-- we kill with 15 -->
+          <start name="ENCODEP3" />
+        </exit>
+      </actions>
+    </program>
+    <program name="ENCODEP3">
+      <cmd>killall acestreamengine</cmd>
+      <cmd>bash ./convert.bash /home/pberck/latest.ts p3.mp4</cmd>
+      <init />
+      <actions>
+        <exit />
+      </actions>
+    </program>
+
+    <program name="Q">
+      <cmd>sh ./launch.sh</cmd>
+      <limit maxruntime="4200" />
+      <init>
+	<start at="2019-03-30 16:00:00" />
+      </init>
+      <actions>
+        <exit signal="15">
+          <start name="ENCODEQ" />
+        </exit>
+      </actions>
+    </program>
+    <program name="ENCODEQ">
+      <cmd>killall acestreamengine</cmd>
+      <cmd>bash ./convert.bash /home/pberck/latest.ts q.mp4</cmd>
+      <init />
+      <actions>
+        <exit />
+      </actions>
+    </program>
+
+  </programs>
+</peter>
