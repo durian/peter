@@ -72,7 +72,7 @@ WorkUnit::WorkUnit( XMLNode *xml ) {
       memset( &tm, 0, sizeof tm );
       t_at = utc(); 
       if ( strptime(at.c_str(), "%Y-%m-%d %H:%M:%S", &tm) ) {
-	t_at = mktime( &tm );
+	t_at = mktime( &tm ); // PJB FIXME check is in the past?
       }
     } else {
       std::string after = xml->get_attribute( "after", "0" );
