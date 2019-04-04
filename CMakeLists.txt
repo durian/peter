@@ -3,6 +3,11 @@ project(peter)
 
 add_definitions(-DVERSION="1.1.6")
 
+set(CMAKE_CXX_FLAGS "-Wall")
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+install(DIRECTORY DESTINATION ${CMAKE_BINARY_DIR}/bin)
+
 include(FindEXPAT)
 find_package(EXPAT REQUIRED)
 include_directories(${EXPAT_INCLUDE_DIRS})
@@ -23,3 +28,7 @@ target_link_libraries(${PROJECT_NAME} ${EXPAT_LIBRARIES})
 target_link_libraries(otpcmd ${EXPAT_LIBRARIES})
 
 target_link_libraries(${PROJECT_NAME} pthread)
+
+#https://stackoverflow.com/questions/6594796/how-do-i-make-cmake-output-into-a-bin-dir
+#INSTALL(TARGETS peter DESTINATION bin/)
+
